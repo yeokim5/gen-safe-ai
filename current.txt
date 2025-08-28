@@ -1,3 +1,6 @@
 make intput => output correctly with mockup data.
 validate both FMECA & FTA is it a correct format?
 the shape of it and the element of it
+
+
+rather than markdown, just regular table? so that i can change easily and export as an excel or image?
