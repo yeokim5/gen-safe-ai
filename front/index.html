@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen-SAFE</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>Gen-SAFE</h1>
+            <p>Safety Analysis Generator</p>
+        </div>
+        
+        <div class="input-section">
+            <label for="system-description">System Description:</label>
+            <textarea 
+                id="system-description" 
+                placeholder="Enter your system description here..."
+                rows="6"
+            ></textarea>
+        </div>
+
+        <div class="button-section">
+            <button id="convert-btn" class="convert-button">
+                Convert to FMECA and FTA
+            </button>
+        </div>
+
+        <div id="output-section" class="output-section hidden">
+            <div class="output-header">
+                <h2>Analysis Results</h2>
+            </div>
+            
+            <div class="output-tabs">
+                <button class="tab-button active" data-tab="fmeca">FMECA</button>
+                <button class="tab-button" data-tab="fta">FTA</button>
+            </div>
+
+            <div class="tab-content">
+                <div id="fmeca-content" class="tab-pane active">
+                    <div class="fmeca-controls">
+                        <button id="export-markdown-btn" class="export-button">Export Markdown</button>
+                    </div>
+                    <div id="fmeca-table-container" class="fmeca-table-container">
+                        <!-- FMECA table will be rendered here -->
+                    </div>
+                </div>
+
+                <div id="fta-content" class="tab-pane">
+                    <div class="fta-controls">
+                        <button id="export-mermaid-btn" class="export-button">Export Mermaid</button>
+                    </div>
+                    <div id="fta-diagram" class="mermaid">
+                        <!-- FTA diagram will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

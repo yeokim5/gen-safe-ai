@@ -1,5 +1,8 @@
  Goal: Working AI-powered safety analysis
 
-- [ ] Input Box for System Description => Output: FMECA(Markdown), FTC(Diagram)
-X setup python environtment 
-X git api key
+
+conda create --name gensafe python=3.11
+conda activate gensafe
+
+pip install -r requirements.txt
+

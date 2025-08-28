@@ -1,0 +1,3 @@
+make intput => output correctly with mockup data.
+validate both FMECA & FTA is it a correct format?
+the shape of it and the element of it

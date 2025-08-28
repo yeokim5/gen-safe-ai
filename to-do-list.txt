@@ -1,0 +1,44 @@
+Week 1 – Core Prototype (HTML/CSS/JS)
+Goal: A working, shareable AI-powered safety analysis demo.
+[O] Create a GitHub repository (gen-safe-ai).
+[O] Write a basic README.md with the project vision and its alignment to the Forterra role.
+[-] Build the initial frontend using HTML, CSS, and vanilla JavaScript with an input box for system description and output sections for FMECA/FTA.
+[-] Implement the AI backend logic with a basic prompt engineering chain (OpenAI/Claude/Gemini).
+[ ] Deploy the static site to GitHub Pages, Netlify, or Vercel.
+Expert Tip: Keep the scope tight. Aim for 1-2 simple FMECA rows and a toy FTA diagram. Add a sample input YAML so users can test it immediately.
+
+
+Week 2 – Refine AI & Visualization
+Goal: Elevate the demo from a toy to a professional-looking tool.
+[ ] Enhance prompt engineering to include safety standards context (e.g., ISO 26262, MIL-STD-882E).
+[ ] Refine prompts to ensure consistent, standardized outputs.
+[ ] Improve FTA rendering using Mermaid.js or Graphviz.
+[ ] Add a feature to download diagrams (PNG/PDF) and the full report (Markdown/PDF). Consider using ReportLab or WeasyPrint for clean formatting.
+[ ] Clean up the UI layout and styling using professional CSS.
+[ ] Implement basic error handling in JavaScript for malformed AI responses.
+
+
+Week 3 – Backend & Integration (FastAPI + Docker)
+Goal: Transition from a demo to a production-style service.
+[ ] Build a FastAPI backend with /analyze and /health endpoints.
+[ ] Create a Dockerfile to containerize the FastAPI application for reproducible builds.
+[ ] Refactor the frontend JavaScript to make API calls to the FastAPI backend instead of calling the LLM directly.
+[ ] (Optional) Set up a local Postgres database to store past analyses.
+Expert Tip: Focus on the FastAPI + Docker integration. Add at least one unit test for the /analyze endpoint to demonstrate testing discipline.
+
+
+Week 4 – CI/CD + Cloud Deployment
+Goal: Demonstrate the automation and integration skills Forterra requires.
+[ ] Create a GitHub Actions pipeline that lints, tests, builds the Docker image, and pushes it to a container registry (e.g., AWS ECR).
+[ ] Deploy the FastAPI container to AWS (ECS Fargate or Elastic Beanstalk).
+[ ] Configure the deployed frontend to communicate with the AWS-deployed backend.
+[ ] Create an architecture diagram (using Draw.io or Mermaid) illustrating the complete end-to-end flow.
+[ ] Add a usage video/GIF to the README.md.
+Expert Tip: Keep the CI/CD pipeline minimal but functional. The goal is to prove you can build and automate deployment.
+
+
+7. Final Portfolio Deliverables
+Live Demo Link: A publicly accessible URL to the working web application.
+GitHub Repository: A well-documented repo containing the code, pipeline.yaml, architecture diagram, and a comprehensive README.md.
+Demo Video (2–3 mins): A short walkthrough demonstrating an input, the generated analysis, the export feature, and a quick look at the project architecture.
+One-Pager PDF: A concise summary of the project explaining its value proposition, tech stack, and alignment with the AI Integration Engineer role.
