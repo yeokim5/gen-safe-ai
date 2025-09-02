@@ -3,3 +3,4 @@ bugs.
 1. created FTA some of the textbox's height is larger than the others, it looks werid fix it.
 2. delete all code of manual entry section only AI-Assisted one is what i need.
 3. afteri do generate structure with AI, delete the default empty #1 box for each component, connections, safe standards
+.
