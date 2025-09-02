@@ -1,0 +1,301 @@
+.fta-container {
+    background: white;
+    border: 2px solid #2c3e50;
+    border-radius: 4px;
+    padding: 0;
+    margin-top: 10px;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fta-header {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: white;
+    padding: 15px 20px;
+    border-bottom: 3px solid #e67e22;
+    margin: 0;
+}
+
+.fta-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.fta-header .subtitle {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+.fta-content {
+    padding: 20px;
+    background: #f8f9fa;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.fta-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.fta-controls > span:first-child {
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #bdc3c7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.zoom-controls span:first-child {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.zoom-btn {
+    background: #34495e;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 35px;
+    height: 28px;
+}
+
+.zoom-btn:hover:not(:disabled) {
+    background: #2c3e50;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.zoom-btn:active {
+    transform: translateY(0);
+}
+
+.zoom-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.zoom-level {
+    font-weight: 700;
+    color: #2c3e50;
+    min-width: 50px;
+    text-align: center;
+    font-size: 12px;
+    background: #ecf0f1;
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid #bdc3c7;
+}
+
+.export-button {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.export-button:hover {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.export-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-container {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    background: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    position: relative;
+}
+
+.mermaid-diagram {
+    width: 100%;
+    text-align: center;
+    padding: 30px 20px 20px 20px;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Enhanced Mermaid styling for better text display */
+.mermaid-diagram svg {
+    max-width: none !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 800px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Fix text overflow issues */
+.mermaid-diagram .node rect,
+.mermaid-diagram .node circle,
+.mermaid-diagram .node ellipse,
+.mermaid-diagram .node polygon {
+    stroke-width: 2px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.mermaid-diagram .label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: 'Arial', sans-serif !important;
+    dominant-baseline: central !important;
+    text-anchor: middle !important;
+}
+
+/* Ensure text fits in nodes */
+.mermaid-diagram .node {
+    min-width: 120px !important;
+}
+
+.mermaid-diagram .node rect {
+    min-width: 120px !important;
+    min-height: 40px !important;
+    rx: 5px !important;
+    ry: 5px !important;
+}
+
+.mermaid-diagram .node circle {
+    r: 30px !important;
+}
+
+/* Professional FTA styling */
+.mermaid-diagram .node[class*="gate"] rect {
+    fill: #2c3e50 !important;
+    stroke: #34495e !important;
+    stroke-width: 3px !important;
+    min-width: 80px !important;
+    min-height: 50px !important;
+}
+
+.mermaid-diagram .node[class*="gate"] .label {
+    fill: white !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+.mermaid-diagram .node[class*="event"] rect {
+    fill: #ecf0f1 !important;
+    stroke: #2c3e50 !important;
+    stroke-width: 2px !important;
+    min-width: 140px !important;
+    min-height: 45px !important;
+}
+
+.mermaid-diagram .node[class*="top"] rect {
+    fill: #e74c3c !important;
+    stroke: #c0392b !important;
+    stroke-width: 3px !important;
+    min-width: 160px !important;
+    min-height: 50px !important;
+}
+
+.mermaid-diagram .node[class*="top"] .label {
+    fill: white !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.mermaid-diagram .node[class*="intermediate"] rect {
+    fill: #3498db !important;
+    stroke: #2980b9 !important;
+    stroke-width: 2px !important;
+    min-width: 140px !important;
+    min-height: 45px !important;
+}
+
+.mermaid-diagram .node[class*="intermediate"] .label {
+    fill: white !important;
+    font-weight: 600 !important;
+}
+
+.mermaid-diagram .node[class*="basic"] rect {
+    fill: #f39c12 !important;
+    stroke: #e67e22 !important;
+    stroke-width: 2px !important;
+    min-width: 140px !important;
+    min-height: 45px !important;
+}
+
+.mermaid-diagram .node[class*="basic"] .label {
+    fill: white !important;
+    font-weight: 600 !important;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.diagram-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #e74c3c;
+    text-align: center;
+    padding: 20px;
+}
+
+.diagram-error p {
+    margin: 5px 0;
+}
+
+.no-data {
+    padding: 40px;
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    background: #f8f9fa;
+}
