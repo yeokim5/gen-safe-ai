@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './FMECATable.css';
 
-const FMECATable = ({ data }) => {
+const FMECATable = ({ data, systemName, description }) => {
   const fmecaData = data?.fmecaTable || [];
 
   // Helper function to get RPN risk class
@@ -43,25 +43,44 @@ const FMECATable = ({ data }) => {
         format: 'a4'
       });
 
-      // Add title
+      // Add title and system information
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.text('Failure Mode, Effects, and Criticality Analysis (FMECA)', 20, 20);
       
+      let yPos = 30;
+      
+      if (systemName) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`System Name: ${systemName}`, 20, yPos);
+        yPos += 8;
+      }
+      
+      if (description) {
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        const descLines = pdf.splitTextToSize(`Description: ${description}`, 250);
+        pdf.text(descLines, 20, yPos);
+        yPos += descLines.length * 5;
+      }
+      
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
+      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, yPos);
+      yPos += 10;
 
       // Add the table image
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 250; // A4 landscape width minus margins
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      let yPosition = 40;
+      let yPosition = yPos;
       
       // If the image is too tall, split it across pages
-      if (imgHeight > 170) { // A4 landscape height minus margins
-        const pageHeight = 170;
+      const availableHeight = 190 - yPos; // Adjust based on header content
+      if (imgHeight > availableHeight) {
+        const pageHeight = availableHeight;
         let remainingHeight = imgHeight;
         let sourceY = 0;
         

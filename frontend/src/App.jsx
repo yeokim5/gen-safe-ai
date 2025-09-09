@@ -9,6 +9,7 @@ function App() {
   const [analysisData, setAnalysisData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [systemInfo, setSystemInfo] = useState({ systemName: '', description: '' });
 
   const API_BASE_URL = window.location.origin.replace(':5173', ':3000') + '/api';
 
@@ -45,6 +46,12 @@ function App() {
       console.log('📥 Analysis result received:', analysisResult);
 
       setAnalysisData(analysisResult);
+      
+      // Store system info for PDF exports
+      setSystemInfo({
+        systemName: requestBody.systemName || '',
+        description: requestBody.description || ''
+      });
 
     } catch (error) {
       console.error('❌ API call failed:', error);
@@ -135,6 +142,8 @@ function App() {
           <OutputSection 
             analysisData={analysisData}
             error={error}
+            systemName={systemInfo.systemName}
+            description={systemInfo.description}
           />
         )}
       </div>

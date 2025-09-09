@@ -3,7 +3,7 @@ import FMECATable from './FMECATable';
 import FTADiagram from './FTADiagram';
 import './OutputSection.css';
 
-const OutputSection = ({ analysisData, error }) => {
+const OutputSection = ({ analysisData, error, systemName, description }) => {
   const [activeTab, setActiveTab] = useState('fmeca');
 
   if (error && !analysisData) {
@@ -49,13 +49,21 @@ const OutputSection = ({ analysisData, error }) => {
       <div className="tab-content">
         {activeTab === 'fmeca' && (
           <div className="tab-pane active">
-            <FMECATable data={analysisData.results.fmeca} />
+            <FMECATable 
+              data={analysisData.results.fmeca} 
+              systemName={systemName}
+              description={description}
+            />
           </div>
         )}
         
         {activeTab === 'fta' && (
           <div className="tab-pane active">
-            <FTADiagram data={analysisData.results.fta} />
+            <FTADiagram 
+              data={analysisData.results.fta}
+              systemName={systemName}
+              description={description}
+            />
           </div>
         )}
       </div>

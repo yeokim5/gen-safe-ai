@@ -4,11 +4,14 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './FTADiagram.css';
 
-const FTADiagram = ({ data }) => {
+const FTADiagram = ({ data, systemName, description }) => {
   const diagramRef = useRef(null);
   const containerRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 
   const minZoom = 0.3;
   const maxZoom = 3.0;
@@ -84,41 +87,96 @@ const FTADiagram = ({ data }) => {
     if (diagramRef.current) {
       const svg = diagramRef.current.querySelector('svg');
       if (svg) {
-        svg.style.transform = `scale(${zoom})`;
+        svg.style.transform = `scale(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`;
         svg.style.transformOrigin = 'center center';
-        svg.style.transition = 'transform 0.3s ease';
+        svg.style.transition = isDragging ? 'none' : 'transform 0.3s ease';
+        svg.style.cursor = zoom > 1 ? 'grab' : 'default';
       }
     }
   };
 
-  // Apply zoom whenever zoom state changes
+  // Apply zoom whenever zoom state or pan offset changes
   useEffect(() => {
     applyZoom();
-  }, [zoom]);
+  }, [zoom, panOffset, isDragging]);
+
+  // Mouse event handlers for dragging
+  const handleMouseDown = (e) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      const svg = diagramRef.current?.querySelector('svg');
+      if (svg) {
+        svg.style.cursor = 'grabbing';
+      }
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging && zoom > 1) {
+      setPanOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      const svg = diagramRef.current?.querySelector('svg');
+      if (svg) {
+        svg.style.cursor = zoom > 1 ? 'grab' : 'default';
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      const svg = diagramRef.current?.querySelector('svg');
+      if (svg) {
+        svg.style.cursor = zoom > 1 ? 'grab' : 'default';
+      }
+    }
+  };
+
+  // Reset pan when zoom is reset or changed significantly
+  const resetPan = () => {
+    setPanOffset({ x: 0, y: 0 });
+  };
 
   const handleZoomIn = () => {
     if (zoom < maxZoom) {
-      setZoom(Math.min(zoom + zoomStep, maxZoom));
+      handleZoomChange(Math.min(zoom + zoomStep, maxZoom));
     }
   };
 
   const handleZoomOut = () => {
     if (zoom > minZoom) {
-      setZoom(Math.max(zoom - zoomStep, minZoom));
+      handleZoomChange(Math.max(zoom - zoomStep, minZoom));
     }
   };
 
   const handleZoomReset = () => {
     setZoom(1);
+    resetPan();
+  };
+
+  const handleZoomChange = (newZoom) => {
+    setZoom(newZoom);
+    if (newZoom <= 1) {
+      resetPan();
+    }
   };
 
   // Export FTA as PDF
   const exportToPDF = async () => {
     if (!diagramRef.current) return;
 
+    const originalZoom = zoom;
     try {
       // Temporarily reset zoom for export
-      const originalZoom = zoom;
       setZoom(1);
       
       // Wait for zoom to apply
@@ -140,27 +198,48 @@ const FTADiagram = ({ data }) => {
         format: 'a4'
       });
 
-      // Add title
+      // Get page dimensions
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Add title and system information
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.text('Fault Tree Analysis (FTA)', 20, 20);
       
+      let yPos = 30;
+      
+      if (systemName) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`System Name: ${systemName}`, 20, yPos);
+        yPos += 8;
+      }
+      
+      if (description) {
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        const descLines = pdf.splitTextToSize(`Description: ${description}`, pageWidth - 40);
+        pdf.text(descLines, 20, yPos);
+        yPos += descLines.length * 5;
+      }
+      
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
+      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, yPos);
+      yPos += 10;
 
       // Add the diagram
       const imgData = canvas.toDataURL('image/png');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = pageWidth - 40; // margins
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      let yPosition = 40;
+      let yPosition = yPos;
       
-      if (imgHeight > pageHeight - 60) {
+      if (imgHeight > pageHeight - yPos - 20) {
         // Scale down if too large
-        const scaleFactor = (pageHeight - 60) / imgHeight;
+        const availableHeight = pageHeight - yPos - 20;
+        const scaleFactor = availableHeight / imgHeight;
         const scaledWidth = imgWidth * scaleFactor;
         const scaledHeight = imgHeight * scaleFactor;
         pdf.addImage(imgData, 'PNG', 20, yPosition, scaledWidth, scaledHeight);
@@ -175,6 +254,7 @@ const FTADiagram = ({ data }) => {
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
+      // Restore original zoom even on error
       setZoom(originalZoom);
     }
   };
@@ -201,7 +281,6 @@ const FTADiagram = ({ data }) => {
       <div className="fta-content">
         <div className="fta-controls">
           <div className="zoom-controls">
-            <span>🔍</span>
             <button className="zoom-btn" onClick={handleZoomOut} disabled={zoom <= minZoom}>
               -
             </button>
@@ -218,7 +297,18 @@ const FTADiagram = ({ data }) => {
           </button>
         </div>
 
-        <div ref={containerRef} className="diagram-container">
+        <div 
+          ref={containerRef} 
+          className="diagram-container"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            overflow: zoom > 1 ? 'hidden' : 'auto',
+            cursor: isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')
+          }}
+        >
           {isLoading && <div className="loading">Rendering diagram...</div>}
           <div ref={diagramRef} className="mermaid-diagram"></div>
         </div>
