@@ -52,7 +52,7 @@ app.use(morgan('combined'));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500'],
+    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://localhost:5500'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -93,10 +93,10 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Gen-SAFE server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Frontend: http://localhost:${PORT}`);
-  console.log(`🔗 API Health: http://localhost:${PORT}/api/health`);
+  console.log(`Gen-SAFE server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Frontend: http://localhost:${PORT}`);
+  console.log(`API Health: http://localhost:${PORT}/api/health`);
   
   if (!process.env.OPENAI_API_KEY) {
     console.warn('⚠️  Warning: OPENAI_API_KEY not set in environment variables');

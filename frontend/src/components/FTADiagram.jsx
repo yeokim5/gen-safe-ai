@@ -200,7 +200,6 @@ const FTADiagram = ({ data }) => {
       
       <div className="fta-content">
         <div className="fta-controls">
-          <span>🌳</span>
           <div className="zoom-controls">
             <span>🔍</span>
             <button className="zoom-btn" onClick={handleZoomOut} disabled={zoom <= minZoom}>

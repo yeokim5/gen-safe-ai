@@ -489,7 +489,7 @@ Respond ONLY with valid JSON, no additional text.`;
     });
 
     const response = completion.choices[0].message.content.trim();
-    console.log('🤖 Raw AI structure response:', response);
+    console.log('Raw AI structure response:', response);
 
     // Parse the JSON response
     try {

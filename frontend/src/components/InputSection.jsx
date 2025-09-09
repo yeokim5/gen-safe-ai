@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './InputSection.css';
 
 const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
-  const [inputMode, setInputMode] = useState('manual'); // 'manual' or 'ai-assisted'
+  // Always in AI-assisted mode now
   const [systemName, setSystemName] = useState('');
   const [description, setDescription] = useState('');
   const [components, setComponents] = useState([{ name: '', function: '' }]);
@@ -60,7 +60,10 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
   };
 
   const addComponent = () => {
-    setComponents([...components, { name: '', function: '' }]);
+    setComponents([...components, { 
+      name: '', 
+      function: '' 
+    }]);
   };
 
   const removeComponent = (index) => {
@@ -78,7 +81,11 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
 
   // Connection management functions
   const addConnection = () => {
-    setConnections([...connections, { from: '', to: '', type: '' }]);
+    setConnections([...connections, { 
+      from: '', 
+      to: '', 
+      type: '' 
+    }]);
   };
 
   const removeConnection = (index) => {
@@ -96,7 +103,10 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
 
   // Safety standards management functions
   const addSafetyStandard = () => {
-    setSafetyStandards([...safetyStandards, { standard: '', requirement: '' }]);
+    setSafetyStandards([...safetyStandards, { 
+      standard: '', 
+      requirement: '' 
+    }]);
   };
 
   const removeSafetyStandard = (index) => {
@@ -139,15 +149,15 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
 
       const structureData = await response.json();
       
-      // Merge AI-generated data with existing data
-      if (structureData.components) {
-        setComponents([...components, ...structureData.components]);
+      // Replace existing data with AI-generated data
+      if (structureData.components && structureData.components.length > 0) {
+        setComponents(structureData.components);
       }
-      if (structureData.connections) {
-        setConnections([...connections, ...structureData.connections]);
+      if (structureData.connections && structureData.connections.length > 0) {
+        setConnections(structureData.connections);
       }
-      if (structureData.safetyStandards) {
-        setSafetyStandards([...safetyStandards, ...structureData.safetyStandards]);
+      if (structureData.safetyStandards && structureData.safetyStandards.length > 0) {
+        setSafetyStandards(structureData.safetyStandards);
       }
 
     } catch (error) {
@@ -161,23 +171,7 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
   return (
     <>
       <div className="input-section">
-        <h3 className="form-title">System Information</h3>
-
-        {/* Input Mode Toggle */}
-        <div className="input-mode-toggle">
-          <button 
-            className={`mode-btn ${inputMode === 'manual' ? 'active' : ''}`}
-            onClick={() => setInputMode('manual')}
-          >
-            ✏️ Manual Entry
-          </button>
-          <button 
-            className={`mode-btn ${inputMode === 'ai-assisted' ? 'active' : ''}`}
-            onClick={() => setInputMode('ai-assisted')}
-          >
-            🤖 AI-Assisted
-          </button>
-        </div>
+        <h3 className="form-title">AI-Assisted System Information</h3>
         
         <div className="form-group">
           <label htmlFor="system-name">System Name:</label>
@@ -203,21 +197,19 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
           />
         </div>
 
-        {/* AI Generation Button (only in AI-assisted mode) */}
-        {inputMode === 'ai-assisted' && (
-          <div className="ai-generation-section">
-            <button 
-              className={`ai-generate-btn ${isGeneratingStructure ? 'loading' : ''}`}
-              onClick={generateStructureWithAI}
-              disabled={isGeneratingStructure || !systemName || !description}
-            >
-              {isGeneratingStructure ? '🔄 Generating Structure...' : '🚀 Generate Structure with AI'}
-            </button>
-            <p className="ai-help-text">
-              Fill in System Name and Description above, then click to generate components, connections, and safety standards using AI.
-            </p>
-          </div>
-        )}
+        {/* AI Generation Button */}
+        <div className="ai-generation-section">
+          <button 
+            className={`ai-generate-btn ${isGeneratingStructure ? 'loading' : ''}`}
+            onClick={generateStructureWithAI}
+            disabled={isGeneratingStructure || !systemName || !description}
+          >
+            {isGeneratingStructure ? 'Generating Structure...' : 'Generate Structure with AI'}
+          </button>
+          <p className="ai-help-text">
+            Fill in System Name and Description above, then click to generate components, connections, and safety standards using AI.
+          </p>
+        </div>
 
         <div className="form-group">
           <div className="components-header">

@@ -81,7 +81,7 @@ router.post('/generate', async (req, res, next) => {
       }
     }
 
-    console.log('🤖 Starting AI analysis generation...');
+    console.log('Starting AI analysis generation...');
     
     // Generate FMECA and FTA in parallel for better performance
     const [fmecaResult, ftaResult] = await Promise.all([
@@ -173,7 +173,7 @@ router.post('/generate-structure', async (req, res) => {
       });
     }
 
-    console.log('🤖 Structure generation request received:', {
+    console.log('Structure generation request received:', {
       timestamp: new Date().toISOString(),
       systemName,
       ip: req.ip

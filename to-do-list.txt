@@ -1,6 +1,14 @@
-bugs.
+fixing parts.
 
-1. created FTA some of the textbox's height is larger than the others, it looks werid fix it.
-2. delete all code of manual entry section only AI-Assisted one is what i need.
-3. afteri do generate structure with AI, delete the default empty #1 box for each component, connections, safe standards
-.
+1. i don't want "SYSTEM INFORMATION
+✏️ MANUAL ENTRY
+🤖 AI-ASSISTED" 
+only AI-Assisted as default don't even have a choice to choose.
+
+2. when i click generate structure "Generating Structure" the button gets very big change that i don't want the button to get big.
+
+3. after the components are created, #1 for each sections have empty componetns, fix that to fill it starting from #1 component
+
+
+
+

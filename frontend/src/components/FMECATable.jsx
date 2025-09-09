@@ -112,7 +112,6 @@ const FMECATable = ({ data }) => {
       </div>
       
       <div className="fmeca-controls">
-        <span>📊</span>
         <button className="export-button" onClick={exportToPDF}>
           Export PDF
         </button>
