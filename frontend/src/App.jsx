@@ -13,10 +13,12 @@ function App() {
 
   // API URL configuration for different environments
   const API_BASE_URL = (() => {
-    if (import.meta.env.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL + '/api';
+    // In production (Vercel), use local API routes that proxy to Railway
+    // In development, connect directly to local backend
+    if (import.meta.env.PROD) {
+      return '/api';
     }
-    // Fallback for local development
+    // Local development - connect directly to local backend
     return window.location.origin.replace(':5173', ':3000') + '/api';
   })();
 

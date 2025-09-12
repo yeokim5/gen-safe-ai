@@ -131,7 +131,17 @@ const InputSection = ({ value, onChange, onConvert, isLoading, error }) => {
 
     setIsGeneratingStructure(true);
     try {
-      const API_BASE_URL = window.location.origin.replace(':5173', ':3000') + '/api';
+      // Use the same API URL configuration as App.jsx
+      const API_BASE_URL = (() => {
+        // In production (Vercel), use local API routes that proxy to Railway
+        // In development, connect directly to local backend
+        if (import.meta.env.PROD) {
+          return '/api';
+        }
+        // Local development - connect directly to local backend
+        return window.location.origin.replace(':5173', ':3000') + '/api';
+      })();
+      
       const response = await fetch(`${API_BASE_URL}/analysis/generate-structure`, {
         method: 'POST',
         headers: {
