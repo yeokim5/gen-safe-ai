@@ -51,23 +51,15 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
+    ? (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://your-vercel-app.vercel.app'])
     : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://localhost:5500'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from React build directory
-const reactBuildPath = path.join(__dirname, 'frontend', 'dist');
-
-if (require('fs').existsSync(reactBuildPath)) {
-  console.log('📱 Serving React frontend from:', reactBuildPath);
-  app.use(express.static(reactBuildPath));
-} else {
-  console.error('❌ React build not found. Please run "cd frontend && npm run build"');
-  process.exit(1);
-}
+// Note: Frontend is deployed separately on Vercel
+// Static file serving is not needed for Railway backend deployment
 
 // API Routes
 app.use('/api/analysis', analysisRoutes);
@@ -82,9 +74,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve React frontend for all non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(reactBuildPath, 'index.html'));
+// API-only routes - frontend is deployed separately
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Gen-SAFE API Server',
+    version: process.env.npm_package_version || '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      analysis: '/api/analysis/generate'
+    }
+  });
 });
 
 // Error handling middleware
@@ -93,10 +92,10 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Gen-SAFE server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Frontend: http://localhost:${PORT}`);
-  console.log(`API Health: http://localhost:${PORT}/api/health`);
+  console.log(`🚀 Gen-SAFE API server running on port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
+  console.log(`🔗 Analysis API: http://localhost:${PORT}/api/analysis/generate`);
   
   if (!process.env.OPENAI_API_KEY) {
     console.warn('⚠️  Warning: OPENAI_API_KEY not set in environment variables');

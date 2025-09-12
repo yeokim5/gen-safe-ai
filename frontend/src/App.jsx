@@ -11,7 +11,14 @@ function App() {
   const [error, setError] = useState(null);
   const [systemInfo, setSystemInfo] = useState({ systemName: '', description: '' });
 
-  const API_BASE_URL = window.location.origin.replace(':5173', ':3000') + '/api';
+  // API URL configuration for different environments
+  const API_BASE_URL = (() => {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL + '/api';
+    }
+    // Fallback for local development
+    return window.location.origin.replace(':5173', ':3000') + '/api';
+  })();
 
   // Generate analysis using the API
   const generateAnalysis = async (yamlDescription) => {
