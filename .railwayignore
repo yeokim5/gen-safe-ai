@@ -1,0 +1,22 @@
+# Railway ignore file
+# Exclude frontend directory from Railway deployment
+frontend/
+frontend/**
+
+# Exclude development files
+*.md
+.env.example
+.env.railway
+Dockerfile.local
+deploy.sh
+deploy.bat
+vercel.json
+
+# Exclude test files
+tests/
+coverage/
+
+# Exclude development dependencies
+.git/
+.vscode/
+.idea/

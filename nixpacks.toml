@@ -9,3 +9,6 @@ cmds = ['echo "No build step needed for API server"']
 
 [start]
 cmd = 'npm start'
+
+[variables]
+NODE_ENV = 'production'

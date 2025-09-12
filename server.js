@@ -11,7 +11,7 @@ const analysisRoutes = require('./routes/analysis');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT) || 3000;
 
 // Security middleware
 app.use(helmet({
