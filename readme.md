@@ -1,7 +1,7 @@
 **Gen-SAFE** is an advanced AI-powered engineering tool that automates the generation of professional-grade **FMECA** (Failure Mode, Effects, and Criticality Analysis) and **FTA** (Fault Tree Analysis) documents. Built for safety engineers, system analysts, and engineering teams who need to perform comprehensive safety analysis efficiently.
 
 ## Demo-Link
-
+[demo-link](https://gen-safe.vercel.app/)
 
 ## 📖 How to Use Gen-SAFE
 
