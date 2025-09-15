@@ -13,31 +13,81 @@ const openai = new OpenAI({
 function sanitizeMermaidDiagram(diagramText) {
   if (!diagramText) return diagramText;
   
-  // Replace common problematic patterns
-  let sanitized = diagramText
+  // Split into lines to preserve structure
+  let lines = diagramText.split(/\r?\n/);
+  
+  // Process each line
+  lines = lines.map(line => {
+    // Skip empty lines and comment lines
+    if (!line.trim() || line.trim().startsWith('%%')) {
+      return line;
+    }
+    
     // Replace parentheses in node labels with safer alternatives
-    .replace(/\([^)]*\)/g, (match) => {
+    let sanitizedLine = line.replace(/\([^)]*\)/g, (match) => {
       // Keep the parentheses for node shapes like ([...]) and {...}
       if (match.includes('([') || match.includes('{') || match.includes('((')) {
         return match;
       }
-      // Replace content parentheses with square brackets or remove them
-      return match.replace(/\(/g, ' ').replace(/\)/g, ' ').trim();
-    })
-    // Clean up multiple spaces
-    .replace(/\s+/g, ' ')
-    // Fix any malformed node references
-    .replace(/\[\s*\]/g, '[]')
-    // Ensure proper spacing around arrows
-    .replace(/-->/g, ' --> ')
-    .replace(/---/g, ' --- ')
-    // Remove any trailing whitespace on lines
-    .replace(/[ \t]+$/gm, '')
-    // Ensure proper line endings
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
+      // Replace content parentheses - remove them but keep the text
+      return match.replace(/[()]/g, '');
+    });
     
+    // Clean up spacing around arrows while preserving line structure
+    sanitizedLine = sanitizedLine
+      .replace(/\s*-->\s*/g, ' --> ')
+      .replace(/\s*---\s*/g, ' --- ')
+      // Clean up excessive spaces but preserve single spaces
+      .replace(/\s{2,}/g, ' ')
+      // Remove trailing whitespace
+      .replace(/\s+$/, '');
+    
+    return sanitizedLine;
+  });
+  
+  // Rejoin lines and ensure proper structure
+  let sanitized = lines.join('\n');
+  
+  // Ensure there's a newline after flowchart declaration if missing
+  sanitized = sanitized.replace(/^(flowchart\s+TD)\s*([A-Z])/m, '$1\n    $2');
+  
+  // Ensure proper indentation for nodes and connections
+  sanitized = sanitized.replace(/^([A-Z]\d*.*)/gm, '    $1');
+  sanitized = sanitized.replace(/^(    )(    )(.+)/gm, '$1$3'); // Remove double indentation
+  
   return sanitized;
+}
+
+/**
+ * Fix Mermaid diagram formatting by adding proper newlines and structure
+ * @param {string} diagramText - The raw Mermaid diagram text
+ * @returns {string} Properly formatted diagram text
+ */
+function fixMermaidFormatting(diagramText) {
+  if (!diagramText) return diagramText;
+  
+  // If the diagram is all on one line or has improper formatting, fix it
+  let formatted = diagramText;
+  
+  // Check if it's missing proper newlines (everything after flowchart TD on same line)
+  if (formatted.includes('flowchart TD') && !formatted.includes('flowchart TD\n')) {
+    // Split by common patterns and add newlines
+    formatted = formatted
+      // Add newline after flowchart TD
+      .replace(/flowchart TD\s*/, 'flowchart TD\n    ')
+      // Add newlines before node declarations (capital letters followed by parentheses or braces)
+      .replace(/\s+([A-Z]\d*\s*[\(\[\{])/g, '\n    $1')
+      // Add newlines before gate declarations
+      .replace(/\s+(G\d+\s*\{)/g, '\n    $1')
+      // Add newlines before connections (arrows)
+      .replace(/\s+([A-Z]\d*\s*-->\s*[A-Z]\d*)/g, '\n    $1')
+      // Clean up any double newlines
+      .replace(/\n\n+/g, '\n')
+      // Ensure proper indentation
+      .replace(/\n\s*([A-Z])/g, '\n    $1');
+  }
+  
+  return formatted;
 }
 
 /**
@@ -196,6 +246,8 @@ CRITICAL: For Mermaid diagram text:
 - Avoid parentheses () in node labels - use "BMS" instead of "(BMS)"
 - Keep node text concise and avoid special characters
 - Use underscores instead of spaces in node IDs
+- Each node and connection MUST be on a separate line with proper \\n newlines
+- Proper indentation with 4 spaces for each line after flowchart TD
 - Escape any quotes or special characters properly
 
 Return the response as a valid JSON object with this structure:
@@ -257,9 +309,11 @@ Ensure the Mermaid diagram uses proper syntax with appropriate styling for FTA e
       const jsonText = jsonMatch ? jsonMatch[0] : responseText;
       ftaData = JSON.parse(jsonText);
       
-      // Sanitize and add professional styling to Mermaid diagram
+      // Format and sanitize Mermaid diagram
       if (ftaData.mermaidDiagram) {
-        // Sanitize the diagram to prevent parsing errors
+        // First fix the formatting to ensure proper newlines
+        ftaData.mermaidDiagram = fixMermaidFormatting(ftaData.mermaidDiagram);
+        // Then sanitize to prevent parsing errors
         ftaData.mermaidDiagram = sanitizeMermaidDiagram(ftaData.mermaidDiagram);
         
         ftaData.mermaidDiagram += `
@@ -318,7 +372,7 @@ function parseFTAFallback(responseText) {
   const mermaidMatch = responseText.match(/flowchart\s+TD[\s\S]*?(?=\n\n|\n%|$)/i);
   
   if (mermaidMatch) {
-    const extractedDiagram = sanitizeMermaidDiagram(mermaidMatch[0]);
+    const extractedDiagram = sanitizeMermaidDiagram(fixMermaidFormatting(mermaidMatch[0]));
     return {
       topEvent: "System Critical Failure",
       mermaidDiagram: extractedDiagram,
@@ -436,7 +490,7 @@ function generateMockFTA(systemDescription, isStructured) {
   
   return {
     topEvent: `${systemName} fails to perform critical function`,
-    mermaidDiagram: sanitizeMermaidDiagram(mockDiagram),
+    mermaidDiagram: sanitizeMermaidDiagram(fixMermaidFormatting(mockDiagram)),
     events: [
       {
         id: "A",
