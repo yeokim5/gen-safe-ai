@@ -6,6 +6,41 @@ const openai = new OpenAI({
 });
 
 /**
+ * Sanitize Mermaid diagram text to prevent parsing errors
+ * @param {string} diagramText - The raw Mermaid diagram text
+ * @returns {string} Sanitized diagram text
+ */
+function sanitizeMermaidDiagram(diagramText) {
+  if (!diagramText) return diagramText;
+  
+  // Replace common problematic patterns
+  let sanitized = diagramText
+    // Replace parentheses in node labels with safer alternatives
+    .replace(/\([^)]*\)/g, (match) => {
+      // Keep the parentheses for node shapes like ([...]) and {...}
+      if (match.includes('([') || match.includes('{') || match.includes('((')) {
+        return match;
+      }
+      // Replace content parentheses with square brackets or remove them
+      return match.replace(/\(/g, ' ').replace(/\)/g, ' ').trim();
+    })
+    // Clean up multiple spaces
+    .replace(/\s+/g, ' ')
+    // Fix any malformed node references
+    .replace(/\[\s*\]/g, '[]')
+    // Ensure proper spacing around arrows
+    .replace(/-->/g, ' --> ')
+    .replace(/---/g, ' --- ')
+    // Remove any trailing whitespace on lines
+    .replace(/[ \t]+$/gm, '')
+    // Ensure proper line endings
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+    
+  return sanitized;
+}
+
+/**
  * Generate FMECA (Failure Mode, Effects, and Criticality Analysis)
  * @param {Object} systemDescription - The system description (structured or simple)
  * @param {boolean} isStructured - Whether the input is structured or simple text
@@ -157,6 +192,12 @@ Generate an FTA with these requirements:
 4. Focus on the most safety-critical failure path
 5. Use clear "AND" and "OR" labels in gates for readability
 
+CRITICAL: For Mermaid diagram text:
+- Avoid parentheses () in node labels - use "BMS" instead of "(BMS)"
+- Keep node text concise and avoid special characters
+- Use underscores instead of spaces in node IDs
+- Escape any quotes or special characters properly
+
 Return the response as a valid JSON object with this structure:
 {
   "topEvent": "Description of the critical hazard",
@@ -188,7 +229,7 @@ Return the response as a valid JSON object with this structure:
   }
 }
 
-Ensure the Mermaid diagram uses proper syntax with appropriate styling for FTA elements.`;
+Ensure the Mermaid diagram uses proper syntax with appropriate styling for FTA elements. Avoid parentheses in node labels to prevent parsing errors.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
@@ -216,8 +257,11 @@ Ensure the Mermaid diagram uses proper syntax with appropriate styling for FTA e
       const jsonText = jsonMatch ? jsonMatch[0] : responseText;
       ftaData = JSON.parse(jsonText);
       
-      // Add professional styling to Mermaid diagram
+      // Sanitize and add professional styling to Mermaid diagram
       if (ftaData.mermaidDiagram) {
+        // Sanitize the diagram to prevent parsing errors
+        ftaData.mermaidDiagram = sanitizeMermaidDiagram(ftaData.mermaidDiagram);
+        
         ftaData.mermaidDiagram += `
     
     %% Professional FTA Styling
@@ -270,6 +314,23 @@ function parseFMECAFallback(responseText) {
  * Fallback FTA parser for malformed JSON responses
  */
 function parseFTAFallback(responseText) {
+  // Try to extract any Mermaid diagram from the response text
+  const mermaidMatch = responseText.match(/flowchart\s+TD[\s\S]*?(?=\n\n|\n%|$)/i);
+  
+  if (mermaidMatch) {
+    const extractedDiagram = sanitizeMermaidDiagram(mermaidMatch[0]);
+    return {
+      topEvent: "System Critical Failure",
+      mermaidDiagram: extractedDiagram,
+      events: [],
+      gates: [],
+      analysis: {
+        criticalPath: "Extracted from partial response",
+        recommendations: ["Review system design", "Implement monitoring"]
+      }
+    };
+  }
+  
   // Basic fallback - return structured mock data
   return generateMockFTA({ description: "System analysis" }, false);
 }
@@ -341,9 +402,7 @@ function generateMockFMECA(systemDescription, isStructured) {
 function generateMockFTA(systemDescription, isStructured) {
   const systemName = isStructured ? systemDescription.systemName : "System";
   
-  return {
-    topEvent: `${systemName} fails to perform critical function`,
-    mermaidDiagram: `flowchart TD
+  let mockDiagram = `flowchart TD
     A([${systemName} Critical Failure])
     G1{OR}
     A --> G1
@@ -373,7 +432,11 @@ function generateMockFTA(systemDescription, isStructured) {
     class B,C intermediate;
     class D,E,F,G basic;
     class H,I basic;
-    class A top;`,
+    class A top;`;
+  
+  return {
+    topEvent: `${systemName} fails to perform critical function`,
+    mermaidDiagram: sanitizeMermaidDiagram(mockDiagram),
     events: [
       {
         id: "A",

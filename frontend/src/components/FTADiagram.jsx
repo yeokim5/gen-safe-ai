@@ -73,10 +73,27 @@ const FTADiagram = ({ data, systemName, description }) => {
       setIsLoading(false);
     } catch (error) {
       console.error('Error rendering Mermaid diagram:', error);
+      
+      // Provide more specific error handling
+      let errorMessage = 'Error rendering fault tree diagram';
+      let suggestions = 'Please try again or check the system description format.';
+      
+      if (error.message && error.message.includes('Parse error')) {
+        errorMessage = 'Diagram syntax error detected';
+        suggestions = 'The generated diagram contains invalid syntax. This has been reported and will be fixed in the next generation.';
+      } else if (error.message && error.message.includes('Expecting')) {
+        errorMessage = 'Diagram parsing error';
+        suggestions = 'There was an issue with the diagram format. Please try regenerating the analysis.';
+      }
+      
       diagramRef.current.innerHTML = `
         <div class="diagram-error">
-          <p>Error rendering fault tree diagram</p>
-          <p>Please try again or check the system description format.</p>
+          <p><strong>${errorMessage}</strong></p>
+          <p>${suggestions}</p>
+          <details style="margin-top: 10px; font-size: 12px; color: #666;">
+            <summary>Technical Details (Click to expand)</summary>
+            <pre style="margin-top: 5px; padding: 10px; background: #f5f5f5; border-radius: 4px; overflow-x: auto;">${error.message}</pre>
+          </details>
         </div>
       `;
       setIsLoading(false);
